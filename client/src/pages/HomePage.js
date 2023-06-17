@@ -10,12 +10,11 @@ const HomePage = () => {
         {},
         {
           headers: {
-            Authorization: "Bearer " + localStorage.getItem("token"),
+            Authorization: `Bearer  ${localStorage.getItem("token")}`,
             // Authorization: "Bearer " + localStorage.getItem("token"),
           },
         }
       );
-      console.log(res.data);
     } catch (error) {
       console.log(error);
     }

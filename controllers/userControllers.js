@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const userModel = require("../models/userModels");
 const jwt = require("jsonwebtoken");
+const doctorModal = require("../models/doctorModel");
 
 // register controller
 const registerController = async (req, res) => {
@@ -75,7 +76,8 @@ const loginController = async (req, res) => {
 //auth controller
 const authController = async (req, res) => {
   try {
-    const user = await userModel.findOne({ _id: req.body.userId });
+    const user = await userModel.findById({ _id: req.body.userId });
+    user.password = undefined;
     if (!user) {
       return res.status(200).send({
         message: "user not found",
@@ -84,10 +86,7 @@ const authController = async (req, res) => {
     } else {
       res.status(200).send({
         success: true,
-        data: {
-          name: user.name,
-          email: user.email,
-        },
+        data: user,
       });
     }
   } catch (error) {
@@ -100,4 +99,38 @@ const authController = async (req, res) => {
   }
 };
 
-module.exports = { loginController, registerController, authController };
+// apply doctor controller
+const applyDoctorController = async (req, res) => {
+  try {
+    const newDoctor = await doctorModal({ ...req.body, status: "pending" });
+    // save db
+    await newDoctor.save();
+    // send notification
+    const adminUser = await userModel.findOne({ isAdmin: true });
+    const notification = adminUser.notification;
+    notification.push({
+      type: "apply-doctor-request",
+      message: `${newDoctor.firstName} ${newDoctor.lastName} Has Applied For A Doctor Account`,
+      data: {
+        doctorId: newDoctor._id,
+        name: newDoctor.firstName + " " + newDoctor.lastName,
+        onClickPath: "/admin/doctors",
+      },
+    });
+    await userModel.findByIdAndUpdate(adminUser._id, { notification });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in apply doctor controller",
+      error,
+    });
+  }
+};
+
+module.exports = {
+  loginController,
+  registerController,
+  authController,
+  applyDoctorController,
+};
