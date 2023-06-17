@@ -13,8 +13,24 @@ const ApplyDoctor = () => {
   const handleFinish = async (value) => {
     try {
       dispatch(showLoading());
-      const res = await axios.post();
+      const res = await axios.post(
+        "/api/v1/user/apply-doctor",
+        { ...value, userId: user._id },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      dispatch(hideLoading());
+      if (res.data.success) {
+        message.success(res.data.success);
+        navigate("/");
+      } else {
+        message.error(res.data.success);
+      }
     } catch (error) {
+      dispatch(hideLoading());
       console.log(error);
       message.error("Something Went Wrong");
     }
@@ -38,7 +54,7 @@ const ApplyDoctor = () => {
           <Col xs={24} md={24} lg={8}>
             <Form.Item
               label="Last Name"
-              name="lasttName"
+              name="lastName"
               required
               rules={[{ required: true }]}
             >

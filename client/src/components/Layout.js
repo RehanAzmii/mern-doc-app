@@ -3,7 +3,7 @@ import "../styles/Layout.css";
 import { adminMenu, userMenu } from "../data/data";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { message } from "antd";
+import { Badge, message } from "antd";
 const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,8 +48,13 @@ const Layout = ({ children }) => {
           </div>
           <div className="content">
             <div className="header">
-              <div className="header-content">
-                <i className="fa-solid fa-bell"></i>
+              <div className="header-content" style={{ cursor: "pointer" }}>
+                <Badge
+                  count={user && user.notification.length}
+                  onClick={() => navigate("/notification")}
+                >
+                  <i className="fa-solid fa-bell"></i>
+                </Badge>
                 <NavLink to="/profile">{user?.name}</NavLink>
               </div>
             </div>
