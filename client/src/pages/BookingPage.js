@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import Layout from "../components/Layout";
-import { Row } from "antd";
-import DoctorList from "../components/DoctorList";
-const HomePage = () => {
+import axios from "axios";
+import { useParams } from "react-router-dom";
+
+const BookingPage = () => {
+  const params = useParams();
   const [doctors, setDoctors] = useState([]);
   // login user data
   const getUserData = async () => {
     try {
-      const { data } = await axios.get(
-        "/api/v1/user/getAllDoctors",
-
+      const { data } = await axios.post(
+        "/api/v1/doctor/getSingleDoctor",
+        { doctorId: params.doctorId },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -27,13 +28,19 @@ const HomePage = () => {
 
   useEffect(() => {
     getUserData();
+    //eslint-disable-next-line
   }, []);
   return (
     <Layout>
-      <h1 className="text-center">Home Page</h1>
-      <Row>{doctors && doctors?.map((d, i) => <DoctorList d={d} />)}</Row>
+      <h1>Booking Page</h1>
+      {doctors && (
+        <h1>
+          {" "}
+          Dr . {doctors?.firstName} {doctors?.lastName}
+        </h1>
+      )}
     </Layout>
   );
 };
 
-export default HomePage;
+export default BookingPage;

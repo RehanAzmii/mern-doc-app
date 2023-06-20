@@ -4,6 +4,7 @@ import { Col, Form, Input, Row, TimePicker, message } from "antd";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { showLoading, hideLoading } from "../redux/features/alertSlice";
+import moment from "moment";
 import axios from "axios";
 const ApplyDoctor = () => {
   const { user } = useSelector((state) => state.user);
@@ -15,7 +16,14 @@ const ApplyDoctor = () => {
       dispatch(showLoading());
       const res = await axios.post(
         "/api/v1/user/apply-doctor",
-        { ...value, userId: user._id },
+        {
+          ...value,
+          userId: user._id,
+          timings: [
+            moment(value.timings[0]).format("HN:mm"),
+            moment(value.timings[1]).format("HN:mm"),
+          ],
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -137,7 +145,6 @@ const ApplyDoctor = () => {
               rules={[{ required: true }]}
             >
               <TimePicker.RangePicker />
-              {/* <Input type="text" placeholder="your Timing" /> */}
             </Form.Item>
           </Col>
           <Col xs={24} md={24} lg={8}></Col>
